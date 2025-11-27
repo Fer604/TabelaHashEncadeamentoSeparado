@@ -1,3 +1,5 @@
+package tabela;
+
 import lista.listaEncadeada;
 
 public class tabela{
@@ -5,7 +7,7 @@ public class tabela{
     private int colisoes;
     private int elementos;
     private int tamanhoTabela;
-    private int[] len; //comprimento por "bucket"/slot/lista na tabela hash
+    private int[] len; //comprimento por "bucket"/slot/lista na tabela.tabela hash
     private int funcaoHashBase;
 
 
@@ -23,7 +25,7 @@ public class tabela{
     public int hash(int chave){
         switch (funcaoHashBase) {
             case 0:return (hashes.hMul(chave) & 0x7fffffff)%tamanhoTabela;
-            case 1: return (hashes.hMisto(chave) & 0x7fffffff)%tamanhoTabela;
+            case 1: return (hashes.hDobramento(chave) & 0x7fffffff)%tamanhoTabela;
             default:return (hashes.hDiv(chave,tamanhoTabela));
         }
     }
