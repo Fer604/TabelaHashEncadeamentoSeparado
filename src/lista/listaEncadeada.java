@@ -182,4 +182,19 @@ public class listaEncadeada {
         }
         return tamanho;
     }
+    // procura pelo código e retorna número de comparações
+    // se encontrado -> retorna positivo = número de comparações até achar
+    // se não encontrado -> retorna negativo = -(número de comparações feitas)
+    public int procurarComparacoes(int codigo) {
+        node atual = Lista;
+        int comparacoes = 0;
+        while (atual != null) {
+            comparacoes++;
+            if (atual.getInformacao().getCodigoNumerico() == codigo) {
+                return comparacoes; // achou
+            }
+            atual = atual.getProximo();
+        }
+        return -comparacoes; // não achou
+    }
 }

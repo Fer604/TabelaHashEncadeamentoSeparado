@@ -4,11 +4,12 @@ import lista.listaEncadeada;
 
 public class tabela{
     private listaEncadeada[] tabela;
-    private int colisoes;
+    private int colisoesLista;
+    private int colisoesTabela;
     private int elementos;
     private int tamanhoTabela;
     private int[] len; //comprimento por "bucket"/slot/lista na tabela.tabela hash
-    private int funcaoHashBase;
+    private static int funcaoHashBase;
 
 
     public tabela(int tamanho){
@@ -19,19 +20,19 @@ public class tabela{
             tabela[i] = new listaEncadeada();
             len[i] = 0;
         }
-        colisoes = 0;
+        colisoesLista = 0;
         elementos = 0;
     }
     public int hash(int chave){
         switch (funcaoHashBase) {
-            case 0:return (hashes.hMul(chave) & 0x7fffffff)%tamanhoTabela;
-            case 1: return (hashes.hDobramento(chave) & 0x7fffffff)%tamanhoTabela;
+            case 0:return (hashes.hMul(chave,tamanhoTabela));
+            case 1: return (hashes.hDobramento(chave,tamanhoTabela));
             default:return (hashes.hDiv(chave,tamanhoTabela));
         }
     }
 
 
-    public void setHashBase(int b) {
+    public static void setHashBase(int b) {
         funcaoHashBase = b;
     }
 
@@ -40,9 +41,12 @@ public class tabela{
     public void inserir(registro registro){
         int indice = hash(registro.getCodigoNumerico());
 
-        colisoes += len[indice];
+        colisoesLista += len[indice];
+        if (len[indice] > 0){
+            colisoesTabela++;
+        }
 
-        tabela[indice].inserePrimeiro(registro);
+        tabela[indice].inserir(registro);//não sei porque no final só deixa mais devagar, O(n) em vez de O(1)
         len[indice] ++;
 
         elementos++;
@@ -52,11 +56,19 @@ public class tabela{
         int indice = hash(r.getCodigoNumerico());
         return tabela[indice].contem(r);
     }
+    // busca que retorna comparações: usado para medir cmp_hits / cmp_misses e tempo
+    // retorna um inteiro: se >0 => hit com 'x' comparações; se <0 => miss com '-x' comparações
+    public int buscarComparacoes(int codigo) {
+        int indice = hash(codigo);
+        return tabela[indice].procurarComparacoes(codigo);
+    }
 
 
-
-    public int getColisoes() {
-        return colisoes;
+    public int getColisoesTabela() {
+        return colisoesTabela;
+    }
+    public int getColisoesLista() {
+        return colisoesLista;
     }
 
     public  int getTamanho() {
@@ -64,14 +76,10 @@ public class tabela{
     }
 
 
-    public  int getElementos() {
-        return elementos;
-    }
 
 
-    public double getFatorCarga(){
-        return (double) elementos /tamanhoTabela;
-    }
+
+
 
 
     public void limpar(){
@@ -79,7 +87,7 @@ public class tabela{
             tabela[i] = new listaEncadeada();
             len[i] = 0;
         }
-        colisoes = 0;
+        colisoesLista = 0;
         elementos = 0;
     }
 
@@ -115,9 +123,9 @@ public class tabela{
         int anterior = -1;
 
         for (int i=0 ; i<tamanhoTabela ; i++){
-            if (len[i] > 0) {  // bucket ocupado
+            if (len[i] > 0) {  // bucket/slot/espaço ocupado
                 if (anterior != -1){
-                    int gap = i - anterior;
+                    int gap = i - anterior- 1;
                     soma += gap;
                     if (gap < menor) menor = gap;
                     if (gap > maior) maior = gap;
