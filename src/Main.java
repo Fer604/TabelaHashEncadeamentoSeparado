@@ -29,7 +29,7 @@ public class Main {
         try (BufferedWriter bw = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(outCsv), StandardCharsets.UTF_8), 1<<20)) {//filOutputStream dá "throw" de uma exception não consigo utilizar sem try
             // Cabeçalho do CSV com todas as métricas pedidas no enunciado.
-            bw.write("m,n,func,seed,ins_ms,coll_tbl,coll_lst,find_ms_hits,find_ms_misses,cmp_hits,cmp_misses,checksum\n");
+            bw.write("m,n,func,seed,ins_ms,coll_tbl,coll_lst,find_ms_hits,find_ms_misses,cmp_hits,cmp_misses,checksum,\n");
 
             for (int i = 0; i < 3; i++) {
                     long seed = seeds[i];
